@@ -5,7 +5,7 @@
 
 [Mongoose](http://mongoosejs.com/) plugin to automatically sync documents to [Algolia](https://www.algolia.com/)
 
-This module lets you sync your document from mongoose to algolia on the fly. By plugging into Mongoose, Algolia will automatically get all your new/changed/removed documents synchronized. 
+This module syncs your documents from mongoose to Algolia for you. By plugging into Mongoose, Algolia will automatically synchronize your new/changed/removed documents.
 
 ### Installation
 `npm install --save mongoose-algolia`
