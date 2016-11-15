@@ -1,0 +1,39 @@
+{
+  "name": "mongoose-algolia",
+  "description": "Mongoose plugin to automatically sync documents to Algolia",
+  "main": "src/index.js",
+  "scripts": {
+    "commit": "git-cz",
+    "test": "echo \"No tests yet\"",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/crsten/mongoose-algolia.git"
+  },
+  "keywords": [
+    "mongoose",
+    "plugin",
+    "algolia",
+    "index",
+    "sync"
+  ],
+  "author": "'Carsten <'car.jacobsen@gmail.com'> (http://www.crsten.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/crsten/mongoose-algolia/issues"
+  },
+  "homepage": "https://github.com/crsten/mongoose-algolia#readme",
+  "dependencies": {
+    "algoliasearch": "^3.19.1",
+    "cli-color": "^1.1.0"
+  },
+  "devDependencies": {
+    "commitizen": "^2.8.6",
+    "cz-conventional-changelog": "^1.2.0",
+    "semantic-release": "^4.3.5"
+  },
+  "czConfig": {
+    "path": "node_modules/cz-conventional-changelog"
+  }
+}
