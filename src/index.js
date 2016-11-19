@@ -9,7 +9,7 @@ module.exports = exports = function algoliaIntegration(schema,options) {
   if(!options || !options.apiKey) console.error(clc.cyanBright('[Algolia-sync]'),' -> ',clc.red.bold('Error'),' -> options.apiKey is required');
 
   const client = algolia(options.appId,options.apiKey);
-  const index = client.initIndex(options.indexName);
+  const index = (typeof options.indexName === 'string') ? client.initIndex(options.indexName) : null ;
 
   schema.pre('save',function(next) {
     this.wasNew = this.isNew;
@@ -18,8 +18,9 @@ module.exports = exports = function algoliaIntegration(schema,options) {
   });
 
   schema.post('save',function() {
+    let currentIndex = GetIndex(this);
     if(this.wasNew) {
-      index.addObject(this.toObject({
+      currentIndex.addObject(this.toObject({
         transform: function(doc,ret) {
           delete ret._id;
           if(options && options.selector) ret = applySelector(ret);
@@ -30,7 +31,7 @@ module.exports = exports = function algoliaIntegration(schema,options) {
         if(options.debug) console.log(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.greenBright('Created'),' -> ObjectId: ',content.objectID);
       });
     }else if(this.wasModified){
-      index.saveObject(this.toObject({
+      currentIndex.saveObject(this.toObject({
         transform: function(doc,ret) {
           delete ret._id;
 
@@ -48,11 +49,16 @@ module.exports = exports = function algoliaIntegration(schema,options) {
   });
 
   schema.post('remove',function(){
-    index.deleteObject(this._id,err => {
+    let currentIndex = GetIndex(this);
+    currentIndex.deleteObject(this._id,err => {
       if(err) return console.error(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.red.bold('Error'),' -> ',err);
       if(options.debug) console.log(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.greenBright('Deleted'),' -> ObjectId: ', this._id);
     });
   });
+
+  function GetIndex(doc) {
+    return index || client.initIndex(options.indexName.call(null,doc));
+  }
 
   function applySelector(doc) {
     let keys = options.selector.split(' ');
