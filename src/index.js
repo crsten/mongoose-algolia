@@ -20,30 +20,38 @@ module.exports = exports = function algoliaIntegration(schema,options) {
   schema.post('save',function() {
     let currentIndex = GetIndex(this);
     if(this.wasNew) {
-      currentIndex.addObject(this.toObject({
-        transform: function(doc,ret) {
-          delete ret._id;
-          if(options && options.selector) ret = applySelector(ret);
-          return ret;
-        }
-      }),this._id,(err,content) => {
-        if(err) return console.error(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.red.bold('Error'),' -> ',err);
-        if(options.debug) console.log(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.greenBright('Created'),' -> ObjectId: ',content.objectID);
+      applyPopulation(this).then(populated => {
+        currentIndex.addObject(populated.toObject({
+          transform: function(doc,ret) {
+            delete ret._id;
+            if(options && options.selector) ret = applySelector(ret);
+            return ret;
+          }
+        }),this._id,(err,content) => {
+          if(err) return console.error(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.red.bold('Error'),' -> ',err);
+          if(options.debug) console.log(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.greenBright('Created'),' -> ObjectId: ',content.objectID);
+        });
+      }).catch(err => {
+        console.error(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.red.bold('Error (at population)'),' -> ',err);
       });
     }else if(this.wasModified){
-      currentIndex.saveObject(this.toObject({
-        transform: function(doc,ret) {
-          delete ret._id;
+      applyPopulation(this).then(populated => {
+        currentIndex.saveObject(populated.toObject({
+          transform: function(doc,ret) {
+            delete ret._id;
 
-          if(options && options.selector) ret = applySelector(ret);
+            if(options && options.selector) ret = applySelector(ret);
 
-          ret.objectID = doc._id;
+            ret.objectID = doc._id;
 
-          return ret;
-        }
-      }),(err, content) => {
-        if(err) return console.error(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.red.bold('Error'),' -> ',err);
-        if(options.debug) console.log(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.greenBright('Updated'),' -> ObjectId: ', content.objectID);
+            return ret;
+          }
+        }),(err, content) => {
+          if(err) return console.error(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.red.bold('Error'),' -> ',err);
+          if(options.debug) console.log(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.greenBright('Updated'),' -> ObjectId: ', content.objectID);
+        });
+      }).catch(err => {
+        console.error(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.red.bold('Error (at population)'),' -> ',err);
       });
     }
   });
@@ -58,6 +66,17 @@ module.exports = exports = function algoliaIntegration(schema,options) {
 
   function GetIndex(doc) {
     return index || client.initIndex(options.indexName.call(null,doc));
+  }
+
+  function applyPopulation(doc) {
+    return new Promise((resolve,reject) => {
+      if(!options.populate) return resolve(doc);
+
+      doc.populate(options.populate,(err, populatedDoc) => {
+        if(err) return reject(err);
+        return resolve(populatedDoc);
+      });
+    });
   }
 
   function applySelector(doc) {
