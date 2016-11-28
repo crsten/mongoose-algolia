@@ -26,8 +26,8 @@ let YourSchema = new Schema({
 YourSchema.plugin(mongooseAlgolia,{
   appId: YOUR_ALGOLIA_APP_ID,
   apiKey: YOUR_ALGOLIA_API_KEY,
-  indexName: 'yourSchema', //The name of the index in algolia, you can also pass in a function
-  selector: '-author', //You can decide which field that are getting synced to algolia (same as selector in mongoose)
+  indexName: 'yourSchema', //The name of the index in Algolia, you can also pass in a function
+  selector: '-author', //You can decide which field that are getting synced to Algolia (same as selector in mongoose)
   populate: {
     path: 'comments',
     select: 'author'
@@ -35,7 +35,13 @@ YourSchema.plugin(mongooseAlgolia,{
   debug: true // Default: false -> If true operations are logged out in your console
 });
 
-mongoose.model('YourSchema', YourSchema);
+
+let Model = mongoose.model('YourSchema', YourSchema);
+
+Model.SyncToAlgolia(); //Clears the Algolia index for this schema and synchronizes all documents to Algolia (based on the settings defined in your plugin settings)
+Model.SetAlgoliaSettings({
+  searchableAttributes: ['name','properties','shows'] //Sets the settings for this schema, see [Algolia's Index settings parameters](https://www.algolia.com/doc/api-client/javascript/settings#set-settings) for more info.
+});
 ```
 
 ### Options
@@ -83,9 +89,27 @@ You can populate fields before sending them to `Algolia` by setting the populate
 #### debug
 You can enable logging of all operations by setting `debug` to true
 
-### Important notes
+###Methods
 
-This plugin synchronizes your documents to algolia at save/update/remove. It wont sync data that has been created before attaching this plugin.
+####SyncToAlgolia
+
+Call this method if you want to sync all your documents with algolia
+
+This method clears the Algolia index for this schema and synchronizes all documents to Algolia (based on the settings defined in your plugin settings)
+
+```js
+Model.SyncToAlgolia();
+```
+
+####SetAlgoliaSettings
+
+Sets the settings for this schema, see [Algolia's Index settings parameters](https://www.algolia.com/doc/api-client/javascript/settings#set-settings) for more info about available parameters.
+
+```js
+Model.SetAlgoliaSettings({
+  searchableAttributes: ['name','properties','shows']
+});
+```
 
 ## License
 
