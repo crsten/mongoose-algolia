@@ -10,10 +10,6 @@ module.exports = function(options,client){
   return new Promise((resolve,reject) => {
     let query = this.find();
 
-    if(options.selector) {
-      query = query.select(options.selector);
-    }
-
     if(options.populate){
       query = query.populate(options.populate);
     }
@@ -55,6 +51,8 @@ module.exports = function(options,client){
 
                   delete ret._id;
                   delete ret.__v;
+
+                  ret = utils.ApplySelector(ret,options.selector);
 
                   ret.objectID = doc._id;
 
