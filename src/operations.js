@@ -21,6 +21,7 @@ module.exports = function(options,client){
             if (doc.constructor.modelName !== populated.constructor.modelName) return ret;
 
             delete ret._id;
+            ret = utils.ApplyDefaults(ret, options.defaults);
             return utils.ApplySelector(ret,options.selector);
           }
         }),this._id,(err,content) => {
@@ -38,6 +39,7 @@ module.exports = function(options,client){
             if (doc.constructor.modelName !== populated.constructor.modelName) return ret;
 
             delete ret._id;
+            ret = utils.ApplyDefaults(ret, options.defaults);
             ret = utils.ApplySelector(ret,options.selector);
 
             ret.objectID = doc._id;

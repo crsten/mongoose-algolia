@@ -14,6 +14,9 @@ const characterSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Show'
   }],
+  age: {
+    type: Number
+  },
   counter: {
     type: Number,
     default: 1
@@ -29,13 +32,17 @@ characterSchema.plugin(algolia,{
     path: 'shows',
     select: 'name genre -_id'
   },
+  defaults: {
+    age: 'unknown',
+    properties: 'notset'
+  },
   debug: true
 });
 
 let Character = mongoose.model('Character',characterSchema);
 
 Character.SetAlgoliaSettings({
-  searchableAttributes: ['name','properties','shows']
+  searchableAttributes: ['name','properties','shows', 'age']
 });
 
 module.exports = Character

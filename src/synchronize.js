@@ -51,7 +51,7 @@ module.exports = function(options,client){
 
                   delete ret._id;
                   delete ret.__v;
-
+                  ret = utils.ApplyDefaults(ret, options.defaults);
                   ret = utils.ApplySelector(ret,options.selector);
 
                   ret.objectID = doc._id;

@@ -8,14 +8,14 @@
           "firstname": "Peter",
           "lastname": "Griffin"
         },
-        "properties": ["funny","fat","father","friend","beer"]
+        "properties": ["funny","fat","father","friend","beer"],
+        "age": 40
       },
       {
         "name": {
           "firstname": "Lois",
           "lastname": "Griffin"
-        },
-        "properties": ["wife","housekeeper"]
+        }
       },
       {
         "name": {

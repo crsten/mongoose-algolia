@@ -32,6 +32,9 @@ YourSchema.plugin(mongooseAlgolia,{
     path: 'comments',
     select: 'author'
   },
+  defaults: {
+    author: 'unknown'
+  },
   debug: true // Default: false -> If true operations are logged out in your console
 });
 
@@ -85,6 +88,10 @@ You can decide which field should be excluded or included by setting the `select
 
 #### populate
 You can populate fields before sending them to `Algolia` by setting the populate property. (same as in mongoose, see [docs about population](http://mongoosejs.com/docs/api.html#document_Document-populate))
+
+#### defaults
+You can set default values for fields that are blank in mongoose.
+This is very useful in cases where you have documents with optional fields. Since it isn't possible to query `null` values in algolia, setting those fields to 'unknown' or 'notset' makes them searchable/filterable.
 
 #### debug
 You can enable logging of all operations by setting `debug` to true

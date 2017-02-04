@@ -10,6 +10,7 @@ module.exports = exports = function algoliaIntegration(schema,opts) {
     appId: null,
     apiKey: null,
     selector: null,
+    defaults: null,
     populate: null,
     debug: false
   }

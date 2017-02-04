@@ -27,7 +27,8 @@ data.forEach(show => {
       Character.create({
         name: character.name,
         properties: character.properties,
-        shows: [createdShow]
+        shows: [createdShow],
+        age: character.age
       },(err,newCharacter) => {
         if(err) return console.log(err);
       });
