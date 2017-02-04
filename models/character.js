@@ -36,6 +36,11 @@ characterSchema.plugin(algolia,{
     age: 'unknown',
     properties: 'notset'
   },
+  mappings: {
+    name: function(value) {
+      return `${value.firstname} ${value.lastname}`
+    }
+  },
   debug: true
 });
 

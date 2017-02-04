@@ -35,6 +35,11 @@ YourSchema.plugin(mongooseAlgolia,{
   defaults: {
     author: 'unknown'
   },
+  mappings: {
+    title: function(value) {
+      return `Book: ${value}`
+    }
+  }
   debug: true // Default: false -> If true operations are logged out in your console
 });
 
@@ -92,6 +97,31 @@ You can populate fields before sending them to `Algolia` by setting the populate
 #### defaults
 You can set default values for fields that are blank in mongoose.
 This is very useful in cases where you have documents with optional fields. Since it isn't possible to query `null` values in algolia, setting those fields to 'unknown' or 'notset' makes them searchable/filterable.
+
+#### mappings
+If you want to modify your fields before sending it to algolia you can create mapping functions.
+
+Let me show you an example:
+
+Dataset:
+```js
+  {
+    name: {
+      firstname: 'Peter',
+      lastname: 'Griffin'
+    }
+  }
+```
+
+Now we dont want to store each field individually but as one string instead. We do it the following way:
+```js
+mappings: {
+  name: function(value) {
+    //Value is the 'name' object
+    return `${value.firstname} ${value.lastname}`; //ES6 is awesome :)
+  }
+}
+```
 
 #### debug
 You can enable logging of all operations by setting `debug` to true

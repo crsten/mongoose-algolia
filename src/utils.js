@@ -15,6 +15,18 @@ function ApplyPopulation(doc,populate) {
   });
 }
 
+function ApplyMappings(doc, mappings) {
+  if(!mappings) return doc;
+
+  Object.keys(mappings).forEach(key => {
+    if(doc[key]) {
+      doc[key] = mappings[key](doc[key]);
+    }
+  });
+
+  return doc;
+}
+
 function ApplyDefaults(doc, defaults) {
   if(!defaults) return doc;
 
@@ -47,5 +59,6 @@ module.exports = {
   GetIndexName,
   ApplySelector,
   ApplyPopulation,
-  ApplyDefaults
+  ApplyDefaults,
+  ApplyMappings
 }
