@@ -55,14 +55,54 @@ function ApplySelector(doc,selector) {
   let keep = keys.filter(key => /^(?!-{1}).+/.test(key));
 
   if(keep.length){
-    for(let key in doc) {
-      if(!keep.includes(key)) { delete doc[key] };
-    }
+    let modifiedDoc = {};
+
+    keep.forEach(entry => {
+      if(entry.includes('.')) {
+        setObjectPathValue(modifiedDoc,entry,getObjectPathValue(doc,entry));
+      }else{
+        modifiedDoc[entry] = doc[entry];
+      }
+    });
+
+    doc = modifiedDoc;
   }else if(remove.length) {
-    remove.forEach(key => { delete doc[key] });
+    remove.forEach(key => deleteObjectPathValue(doc, key));
   }
 
   return doc;
+}
+
+function setObjectPathValue(source, path, value) {
+    let parts = path.split('.'), len = parts.length, target = source;
+
+    for (let i = 0, part; i < len - 1; i++) {
+        part = parts[i];
+        target = target[part] == undefined ? (target[part] = {}) : target[part];
+    }
+    target[parts[len - 1]] = value;
+    return target;
+}
+
+function getObjectPathValue(source, path) {
+    let parts = path.split('.'), len = parts.length, result = source;
+
+    for(let i = 0; i < len - 1; i++) {
+      result = (typeof result === 'object' && parts[i] in result) ? result[parts[i]] : undefined ;
+    }
+
+    return typeof result === 'object' ? result[parts[parts.length - 1]] : undefined;
+}
+
+function deleteObjectPathValue(source, path) {
+    let parts = path.split('.'), len = parts.length, target = source;
+
+    for (let i = 0, part; i < len - 1; i++) {
+        part = parts[i];
+        target = target[part] == undefined ? (target[part] = {}) : target[part];
+    }
+    delete target[parts[len - 1]];
+    return target;
 }
 
 module.exports = {

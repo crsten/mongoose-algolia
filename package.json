@@ -32,10 +32,11 @@
     "commitizen": "^2.8.6",
     "cz-conventional-changelog": "^1.2.0",
     "dotenv": "^2.0.0",
-    "semantic-release": "^4.3.5",
-    "mongoose": "^4.7.0"
+    "mongoose": "^4.7.0",
+    "semantic-release": "^6.3.6"
   },
   "czConfig": {
     "path": "node_modules/cz-conventional-changelog"
-  }
+  },
+  "version": "0.0.0-development"
 }

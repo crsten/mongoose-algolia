@@ -35,7 +35,7 @@ characterSchema.plugin(algolia,{
   indexName: function(doc) {return `${doc.name.lastname}-character`},
   appId: process.env.ALGOLIA_APP_ID,
   apiKey: process.env.ALGOLIA_API_KEY,
-  selector: '-updatedAt -createdAt',
+  selector: '-updatedAt -createdAt -parents.father',
   populate: {
     path: 'shows',
     select: 'name genre -_id'
@@ -44,8 +44,7 @@ characterSchema.plugin(algolia,{
     age: 'unknown',
     properties: 'notset',
     parents: {
-      mother: 'notset',
-      father: 'notset'
+      mother: 'notset'
     }
   },
   mappings: {
