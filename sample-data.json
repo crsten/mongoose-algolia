@@ -22,7 +22,11 @@
           "firstname": "Stewie",
           "lastname": "Griffin"
         },
-        "properties": ["funny","gay","evil"]
+        "properties": ["funny","gay","evil"],
+        "parents": {
+          "mother": "Lois Griffin",
+          "father": "Peter Griffin"
+        }
       }
     ]
   },

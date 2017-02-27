@@ -28,7 +28,11 @@ data.forEach(show => {
         name: character.name,
         properties: character.properties,
         shows: [createdShow],
-        age: character.age
+        age: character.age,
+        parents: {
+          mother: (character.parents) ? character.parents.mother : null,
+          father: (character.parents) ? character.parents.father : null
+        }
       },(err,newCharacter) => {
         if(err) return console.log(err);
       });

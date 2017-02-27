@@ -19,8 +19,14 @@ function ApplyMappings(doc, mappings) {
   if(!mappings) return doc;
 
   Object.keys(mappings).forEach(key => {
-    if(doc[key]) {
-      doc[key] = mappings[key](doc[key]);
+    if(mappings[key] instanceof Array === false && typeof mappings[key] === 'object') {
+      if(doc[key] instanceof Array === false && typeof doc[key] === 'object'){
+        doc[key] = ApplyMappings(doc[key], mappings[key]);
+      }
+    }else{
+      if (doc[key]) {
+        doc[key] = mappings[key](doc[key]);
+      }
     }
   });
 
@@ -31,7 +37,11 @@ function ApplyDefaults(doc, defaults) {
   if(!defaults) return doc;
 
   Object.keys(defaults).forEach(key => {
-    if((doc[key] instanceof Array && !doc[key].length) || !doc[key]) doc[key] = defaults[key];
+    if(defaults[key] instanceof Array === false && typeof defaults[key] === 'object'){
+      doc[key] = ApplyDefaults(doc[key] || {}, defaults[key]);
+    }else{
+      if((doc[key] instanceof Array && !doc[key].length) || !doc[key]) doc[key] = defaults[key];
+    }
   });
 
   return doc;

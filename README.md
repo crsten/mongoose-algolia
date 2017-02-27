@@ -98,6 +98,8 @@ You can populate fields before sending them to `Algolia` by setting the populate
 You can set default values for fields that are blank in mongoose.
 This is very useful in cases where you have documents with optional fields. Since it isn't possible to query `null` values in algolia, setting those fields to 'unknown' or 'notset' makes them searchable/filterable.
 
+*You can nest properties*
+
 #### mappings
 If you want to modify your fields before sending it to algolia you can create mapping functions.
 
@@ -122,6 +124,8 @@ mappings: {
   }
 }
 ```
+
+*You can nest properties*
 
 #### debug
 You can enable logging of all operations by setting `debug` to true

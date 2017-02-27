@@ -20,6 +20,14 @@ const characterSchema = new Schema({
   counter: {
     type: Number,
     default: 1
+  },
+  parents: {
+    mother: {
+      type: String
+    },
+    father: {
+      type: String
+    }
   }
 });
 
@@ -34,11 +42,20 @@ characterSchema.plugin(algolia,{
   },
   defaults: {
     age: 'unknown',
-    properties: 'notset'
+    properties: 'notset',
+    parents: {
+      mother: 'notset',
+      father: 'notset'
+    }
   },
   mappings: {
     name: function(value) {
       return `${value.firstname} ${value.lastname}`
+    },
+    parents: {
+      mother: function(value) {
+        return value.substring(0,1) + ' ' + value.split(' ').pop();
+      }
     }
   },
   debug: true
