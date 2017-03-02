@@ -26,7 +26,8 @@
   "homepage": "https://github.com/crsten/mongoose-algolia#readme",
   "dependencies": {
     "algoliasearch": "^3.19.1",
-    "cli-color": "^1.1.0"
+    "cli-color": "^1.1.0",
+    "deep-keys": "^0.4.0"
   },
   "devDependencies": {
     "commitizen": "^2.8.6",
@@ -35,8 +36,10 @@
     "mongoose": "^4.7.0",
     "semantic-release": "^6.3.6"
   },
-  "czConfig": {
-    "path": "node_modules/cz-conventional-changelog"
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-conventional-changelog"
+    }
   },
   "version": "0.0.0-development"
 }

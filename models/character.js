@@ -35,7 +35,7 @@ characterSchema.plugin(algolia,{
   indexName: function(doc) {return `${doc.name.lastname}-character`},
   appId: process.env.ALGOLIA_APP_ID,
   apiKey: process.env.ALGOLIA_API_KEY,
-  selector: '-updatedAt -createdAt -parents.father',
+  selector: '-updatedAt -createdAt -parents.father -counter',
   populate: {
     path: 'shows',
     select: 'name genre -_id'

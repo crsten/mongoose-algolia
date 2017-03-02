@@ -6,8 +6,15 @@ const clc = require('cli-color');
 module.exports = function(options,client){
 
   this.pre('save',function(next) {
+
+    let isModified = false;
+
+    utils.GetRelevantKeys(this.toJSON(), options.selector).forEach(key => {
+      if(this.isModified(key)) isModified = true;
+    });
+    
     this.wasNew = this.isNew;
-    this.wasModified = this.isModified();
+    this.wasModified = isModified;
     next();
   });
 

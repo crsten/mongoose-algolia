@@ -1,5 +1,7 @@
 'use strict';
 
+const deepKeys = require('deep-keys');
+
 function GetIndexName(doc,indexName) {
   return (typeof indexName === 'string') ? indexName : indexName.call(null,doc) ;
 }
@@ -73,6 +75,24 @@ function ApplySelector(doc,selector) {
   return doc;
 }
 
+function GetRelevantKeys(doc, selector){
+  if(!selector) return null;
+
+  delete doc._id;
+  delete doc.__v;
+
+  let keys = selector.split(' ');
+  let remove = keys.filter(key => /^-{1}.+/.test(key)).map(key => key.substring(1));
+  let keep = keys.filter(key => /^(?!-{1}).+/.test(key));
+
+  if(keep.length){
+    return keep;
+  }else if(remove.length) {
+    let keys = deepKeys(doc);
+    return keys.filter(key => !remove.includes(key));
+  }
+}
+
 function setObjectPathValue(source, path, value) {
     let parts = path.split('.'), len = parts.length, target = source;
 
@@ -110,5 +130,6 @@ module.exports = {
   ApplySelector,
   ApplyPopulation,
   ApplyDefaults,
-  ApplyMappings
+  ApplyMappings,
+  GetRelevantKeys
 }
