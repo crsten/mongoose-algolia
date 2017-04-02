@@ -23,12 +23,17 @@ module.exports = function(options,client){
       let indicesMap = {};
 
       docs.forEach(doc => {
-        let currentIndexName = utils.GetIndexName(doc,options.indexName);
+        let indices = utils.GetIndexName(doc,options.indexName);
 
-        if(indicesMap[currentIndexName]){
-          indicesMap[currentIndexName].push(doc);
-        }else{
-          indicesMap[currentIndexName] = [doc];
+        if(indices instanceof Array) indices.forEach(entry => addToIndex(entry, doc));
+        else addToIndex(indices, doc);
+
+        function addToIndex(entry, item) {
+          if(indicesMap[entry]){
+            indicesMap[entry].push(item);
+          }else{
+            indicesMap[entry] = [item];
+          }
         }
       });
 

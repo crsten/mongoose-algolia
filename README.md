@@ -88,6 +88,8 @@ YourSchema.plugin(mongooseAlgolia,{
 This allows you to have multiple indexes splittet by some properties.
 Very handy in situations where you want to have a seperate index for each company or similar...
 
+**Powerful hint:** Your indexname function can return an array aswell! Let me give you an example: One user belongs to multiple companies, and each company has its own user index -> return an array of all indices the document belongs to, to sync it to every index (company users).   
+
 #### selector
 You can decide which field should be excluded or included by setting the `selector` property (same as in mongoose) *Must be a string*
 

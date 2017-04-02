@@ -12,16 +12,40 @@ module.exports = function(options,client){
     utils.GetRelevantKeys(this.toJSON(), options.selector).forEach(key => {
       if(this.isModified(key)) isModified = true;
     });
-    
+
     this.wasNew = this.isNew;
     this.wasModified = isModified;
     next();
   });
 
   this.post('save',function() {
-    let index = client.initIndex(utils.GetIndexName(this,options.indexName));
-    if(this.wasNew) {
-      utils.ApplyPopulation(this,options.populate).then(populated => {
+    let indices = utils.GetIndexName(this,options.indexName);
+    if(indices instanceof Array) {
+      indices.forEach(index => SyncItem(this, client.initIndex(index)));
+    }else{
+      SyncItem(this, client.initIndex(indices));
+    }
+  });
+
+  this.post('remove',function(){
+    let indices = utils.GetIndexName(this,options.indexName);
+    if(indices instanceof Array) {
+      indices.forEach(index => RemoveItem(this, client.initIndex(index)));
+    }else{
+      RemoveItem(this, client.initIndex(indices));
+    }
+  });
+
+  function RemoveItem(context, index) {
+    index.deleteObject(context._id.toString(),err => {
+      if(err) return console.error(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.red.bold('Error'),' -> ',err);
+      if(options.debug) console.log(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.greenBright('Deleted'),' -> ObjectId: ', context._id);
+    });
+  }
+
+  function SyncItem(context, index){
+    if(context.wasNew) {
+      utils.ApplyPopulation(context,options.populate).then(populated => {
         index.addObject(populated.toObject({
           versionKey: false,
           transform: function(doc,ret) {
@@ -32,15 +56,15 @@ module.exports = function(options,client){
             ret = utils.ApplyDefaults(ret, options.defaults);
             return utils.ApplySelector(ret,options.selector);
           }
-        }),this._id,(err,content) => {
+        }),context._id,(err,content) => {
           if(err) return console.error(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.red.bold('Error'),' -> ',err);
           if(options.debug) console.log(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.greenBright('Created'),' -> ObjectId: ',content.objectID);
         });
       }).catch(err => {
         console.error(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.red.bold('Error (at population)'),' -> ',err);
       });
-    }else if(this.wasModified){
-      utils.ApplyPopulation(this,options.populate).then(populated => {
+    }else if(context.wasModified){
+      utils.ApplyPopulation(context,options.populate).then(populated => {
         index.saveObject(populated.toObject({
           versionKey: false,
           transform: function(doc,ret) {
@@ -63,13 +87,5 @@ module.exports = function(options,client){
         console.error(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.red.bold('Error (at population)'),' -> ',err);
       });
     }
-  });
-
-  this.post('remove',function(){
-    let index = client.initIndex(utils.GetIndexName(this,options.indexName));
-    index.deleteObject(this._id.toString(),err => {
-      if(err) return console.error(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.red.bold('Error'),' -> ',err);
-      if(options.debug) console.log(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.greenBright('Deleted'),' -> ObjectId: ', this._id);
-    });
-  });
+  }
 }

@@ -16,10 +16,15 @@ module.exports = function(settings,options,client){
     let indices = [];
 
     docs.forEach(doc => {
-      let currentIndexName = utils.GetIndexName(doc,options.indexName);
+      let _indices = utils.GetIndexName(doc,options.indexName);
 
-      if(!indices.includes(currentIndexName)){
-        indices.push(currentIndexName);
+      if(_indices instanceof Array) _indices.forEach(entry => addToIndex(entry))
+      else addToIndex(_indices);
+
+      function addToIndex(entry){
+        if(!indices.includes(entry)){
+          indices.push(entry);
+        }
       }
     });
 

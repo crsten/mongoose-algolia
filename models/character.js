@@ -32,7 +32,9 @@ const characterSchema = new Schema({
 });
 
 characterSchema.plugin(algolia,{
-  indexName: function(doc) {return `${doc.name.lastname}-character`},
+  indexName: function(doc) {
+    return (doc.properties && doc.properties.length) ? doc.properties.map(prop => `${prop}-character`) : `default-character` ; 
+  },
   appId: process.env.ALGOLIA_APP_ID,
   apiKey: process.env.ALGOLIA_API_KEY,
   selector: '-updatedAt -createdAt -parents.father -counter',
