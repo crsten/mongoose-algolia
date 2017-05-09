@@ -8,10 +8,7 @@ const utils = require('./utils');
 module.exports = function(settings,options,client){
   this.find()
   .exec((err, docs) => {
-    if(err) {
-      reject(err);
-      return console.error(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.red.bold('Error'),' -> ',err);
-    }
+    if(err) return console.error(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.red.bold('Error'),' -> ',err);
 
     let indices = [];
 
