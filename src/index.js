@@ -13,6 +13,7 @@ module.exports = exports = function algoliaIntegration(schema,opts) {
     defaults: null,
     mappings: null,
     populate: null,
+    softdelete: false,
     debug: false
   }
 

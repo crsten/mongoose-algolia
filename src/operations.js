@@ -44,7 +44,9 @@ module.exports = function(options,client){
   }
 
   function SyncItem(context, index){
-    if(context.wasNew) {
+    if(options.softdelete && context.deleted) {
+      RemoveItem(context, index);
+    } else if(context.wasNew) {
       utils.ApplyPopulation(context,options.populate).then(populated => {
         index.addObject(populated.toObject({
           versionKey: false,
@@ -63,7 +65,7 @@ module.exports = function(options,client){
       }).catch(err => {
         console.error(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.red.bold('Error (at population)'),' -> ',err);
       });
-    }else if(context.wasModified){
+    } else if(context.wasModified){
       utils.ApplyPopulation(context,options.populate).then(populated => {
         index.saveObject(populated.toObject({
           versionKey: false,

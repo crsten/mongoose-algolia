@@ -129,12 +129,18 @@ mappings: {
 
 *You can nest properties*
 
+#### softdelete
+You can enable softdeletion support (like [mongoose-delete](https://github.com/dsanel/mongoose-delete)) by setting `softdelete` to true.
+
+As a result, all documents updated with a property `deleted: true` will be removed from Algolia.
+
+
 #### debug
 You can enable logging of all operations by setting `debug` to true
 
-###Methods
+### Methods
 
-####SyncToAlgolia
+#### SyncToAlgolia
 
 Call this method if you want to sync all your documents with algolia
 
@@ -144,7 +150,7 @@ This method clears the Algolia index for this schema and synchronizes all docume
 Model.SyncToAlgolia();
 ```
 
-####SetAlgoliaSettings
+#### SetAlgoliaSettings
 
 Sets the settings for this schema, see [Algolia's Index settings parameters](https://www.algolia.com/doc/api-client/javascript/settings#set-settings) for more info about available parameters.
 
