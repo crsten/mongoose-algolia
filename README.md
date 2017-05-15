@@ -39,7 +39,10 @@ YourSchema.plugin(mongooseAlgolia,{
     title: function(value) {
       return `Book: ${value}`
     }
-  }
+  },
+  filter: function(doc) {
+    return !doc.softdelete
+  },
   debug: true // Default: false -> If true operations are logged out in your console
 });
 
@@ -129,12 +132,26 @@ mappings: {
 
 *You can nest properties*
 
+#### filter
+If you want to prevent some documents from being synced to algolia, you can do it by letting it go through the filter function.
+The first property is the document.
+
+Simply return true or false (same principle as Array.filter) in order to tell mongooose-algolia if you want to sync it or not.
+
+*Hint* You can enable softdeletion support (like [mongoose-delete](https://github.com/dsanel/mongoose-delete)) by setting filter function to following:
+
+```js
+filter: function(doc) {
+  return !doc.softdelete;
+}
+```
+
 #### debug
 You can enable logging of all operations by setting `debug` to true
 
-###Methods
+### Methods
 
-####SyncToAlgolia
+#### SyncToAlgolia
 
 Call this method if you want to sync all your documents with algolia
 
@@ -144,7 +161,7 @@ This method clears the Algolia index for this schema and synchronizes all docume
 Model.SyncToAlgolia();
 ```
 
-####SetAlgoliaSettings
+#### SetAlgoliaSettings
 
 Sets the settings for this schema, see [Algolia's Index settings parameters](https://www.algolia.com/doc/api-client/javascript/settings#set-settings) for more info about available parameters.
 

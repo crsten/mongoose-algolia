@@ -49,7 +49,9 @@ module.exports = function(options,client){
   }
 
   function SyncItem(context, index){
-    if(context.wasNew) {
+    if(options.filter && !options.filter(context._doc)) {
+      RemoveItem(context, index);
+    }else if(context.wasNew) {
       utils.ApplyPopulation(context,options.populate).then(populated => {
         index.addObject(populated.toObject({
           versionKey: false,
