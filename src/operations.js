@@ -9,9 +9,14 @@ module.exports = function(options,client){
 
     let isModified = false;
 
-    utils.GetRelevantKeys(this.toJSON(), options.selector).forEach(key => {
-      if(this.isModified(key)) isModified = true;
-    });
+    let relevantKeys = utils.GetRelevantKeys(this.toJSON(), options.selector);
+    if(relevantKeys && relevantKeys.length) {
+      relevantKeys.forEach(key => {
+        if(this.isModified(key)) isModified = true;
+      });
+    }else{
+      if(this.isModified()) isModified = true;
+    }
 
     this.wasNew = this.isNew;
     this.wasModified = isModified;
