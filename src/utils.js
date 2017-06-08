@@ -1,6 +1,7 @@
 'use strict';
 
 const deepKeys = require('deep-keys');
+const clc = require('cli-color');
 
 function GetIndexName(doc,indexName) {
   return (typeof indexName === 'string') ? indexName : indexName.call(null,doc) ;
@@ -30,6 +31,17 @@ function ApplyMappings(doc, mappings) {
         doc[key] = mappings[key](doc[key]);
       }
     }
+  });
+
+  return doc;
+}
+
+function ApplyVirtuals(doc, virtuals) {
+  if(!virtuals) return doc;
+
+  Object.keys(virtuals).forEach(key => {
+    if (key in doc) console.error(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.red.bold('Error (Virtuals)'),` -> ${key} is already defined`)
+    else doc[key] = virtuals[key](doc)
   });
 
   return doc;
@@ -131,5 +143,6 @@ module.exports = {
   ApplyPopulation,
   ApplyDefaults,
   ApplyMappings,
+  ApplyVirtuals,
   GetRelevantKeys
 }

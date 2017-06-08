@@ -59,6 +59,7 @@ module.exports = function(options,client){
             if (doc.constructor.modelName !== populated.constructor.modelName) return ret;
 
             delete ret._id;
+            ret = utils.ApplyVirtuals(ret, options.virtuals);
             ret = utils.ApplyMappings(ret, options.mappings);
             ret = utils.ApplyDefaults(ret, options.defaults);
             return utils.ApplySelector(ret,options.selector);
@@ -78,6 +79,7 @@ module.exports = function(options,client){
             if (doc.constructor.modelName !== populated.constructor.modelName) return ret;
 
             delete ret._id;
+            ret = utils.ApplyVirtuals(ret, options.virtuals);
             ret = utils.ApplyMappings(ret, options.mappings);
             ret = utils.ApplyDefaults(ret, options.defaults);
             ret = utils.ApplySelector(ret,options.selector);

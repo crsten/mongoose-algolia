@@ -51,6 +51,11 @@ characterSchema.plugin(algolia,{
       mother: 'notset'
     }
   },
+  virtuals: {
+    sentence: function(doc) {
+      return `${doc.name.firstname} says hi!`
+    }
+  },
   mappings: {
     name: function(value) {
       return `${value.firstname} ${value.lastname}`

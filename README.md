@@ -40,6 +40,11 @@ YourSchema.plugin(mongooseAlgolia,{
       return `Book: ${value}`
     }
   },
+  virtuals: {
+    whatever: function(doc) {
+      return `Custom data ${doc.title}`
+    }
+  },
   filter: function(doc) {
     return !doc.softdelete
   },
@@ -131,6 +136,30 @@ mappings: {
 ```
 
 *You can nest properties*
+
+#### virtuals
+If you need additional fields that are not part of your model, you can use virtuals to create any field you need.
+
+Let me show you an example:
+
+Dataset:
+```js
+  {
+    users: ['uid1','uid2'],
+    groups: ['gid1','gid2']
+  }
+```
+
+Now we dont want to store each field individually but as one array named `acl` instead. We do it the following way:
+```js
+virtuals: {
+  acl: function(doc) {
+    return [...doc.users, ...doc.groups]; //ES6 is awesome :)
+  }
+}
+```
+
+*No nesting here*
 
 #### filter
 If you want to prevent some documents from being synced to algolia, you can do it by letting it go through the filter function.
