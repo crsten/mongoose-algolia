@@ -48,7 +48,11 @@ module.exports = function(options,client){
             }
             if(options.debug) console.log(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.greenBright('Cleared Index'),' -> ',currentIndexName);
 
-            let objects = indicesMap[currentIndexName].map(obj => {
+            let objects = indicesMap[currentIndexName];
+
+            if(options.filter) objects = objects.filter(obj => options.filter(obj._doc));
+
+            objects = objects.map(obj => {
               return obj.toObject({
                 versionKey: false,
                 transform: function(doc,ret) {
