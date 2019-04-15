@@ -5,7 +5,7 @@
   "scripts": {
     "commit": "git-cz",
     "test": "echo \"No tests yet\"",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+    "semantic-release": "semantic-release"
   },
   "repository": {
     "type": "git",
@@ -30,16 +30,16 @@
     "deep-keys": "^0.4.0"
   },
   "devDependencies": {
-    "commitizen": "^2.8.6",
-    "cz-conventional-changelog": "^1.2.0",
+    "cz-conventional-changelog": "^2.1.0",
     "dotenv": "^2.0.0",
     "mongoose": "^4.7.0",
-    "semantic-release": "^6.3.6"
+    "semantic-release": "^15.13.3",
+    "semantic-release-cli": "^4.1.2"
   },
+  "version": "0.0.0-development",
   "config": {
     "commitizen": {
-      "path": "node_modules/cz-conventional-changelog"
+      "path": "./node_modules/cz-conventional-changelog"
     }
-  },
-  "version": "0.0.0-development"
+  }
 }
