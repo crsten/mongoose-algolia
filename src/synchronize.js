@@ -58,13 +58,14 @@ module.exports = function(options,client){
                 transform: function(doc,ret) {
                   if (doc.constructor.modelName !== obj.constructor.modelName) return ret;
 
-                  delete ret._id;
-                  delete ret.__v;
+
                   ret = utils.ApplyVirtuals(ret, options.virtuals);
                   ret = utils.ApplyMappings(ret, options.mappings);
                   ret = utils.ApplyDefaults(ret, options.defaults);
                   ret = utils.ApplySelector(ret,options.selector);
 
+                  delete ret._id;
+                  delete ret.__v;
                   ret.objectID = doc._id;
 
                   return ret;
