@@ -58,10 +58,13 @@ module.exports = function(options,client){
           transform: function(doc,ret) {
             if (doc.constructor.modelName !== populated.constructor.modelName) return ret;
 
-            delete ret._id;
+
             ret = utils.ApplyVirtuals(ret, options.virtuals);
             ret = utils.ApplyMappings(ret, options.mappings);
             ret = utils.ApplyDefaults(ret, options.defaults);
+
+            delete ret._id;
+
             return utils.ApplySelector(ret,options.selector);
           }
         }),context._id,(err,content) => {
@@ -78,12 +81,13 @@ module.exports = function(options,client){
           transform: function(doc,ret) {
             if (doc.constructor.modelName !== populated.constructor.modelName) return ret;
 
-            delete ret._id;
+
             ret = utils.ApplyVirtuals(ret, options.virtuals);
             ret = utils.ApplyMappings(ret, options.mappings);
             ret = utils.ApplyDefaults(ret, options.defaults);
             ret = utils.ApplySelector(ret,options.selector);
 
+            delete ret._id;
             ret.objectID = doc._id;
 
             return ret;
