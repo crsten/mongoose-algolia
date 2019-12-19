@@ -13,7 +13,7 @@ module.exports = function (options, client) {
       query = query.populate(options.populate)
     }
 
-    query.exec((err, docs) => {
+    query.exec(async (err, docs) => {
       if (err) {
         reject(err)
         return console.error(
@@ -29,19 +29,20 @@ module.exports = function (options, client) {
       let indicesMap = {}
 
       for (const doc of docs) {
-        utils.GetIndexName(doc, options.indexName).then(indices => {
-          if (indices instanceof Array) indices.forEach(entry => addToIndex(entry, doc))
-          else addToIndex(indices, doc)
+        const indices = await utils.GetIndexName(doc, options.indexName)
 
-          function addToIndex(entry, item) {
-            if (indicesMap[entry]) {
-              indicesMap[entry].push(item)
-            } else {
-              indicesMap[entry] = [item]
-            }
+        if (indices instanceof Array) indices.forEach(entry => addToIndex(entry, doc))
+        else addToIndex(indices, doc)
+
+        function addToIndex(entry, item) {
+          if (indicesMap[entry]) {
+            indicesMap[entry].push(item)
+          } else {
+            indicesMap[entry] = [item]
           }
-        })
+        }
       }
+
 
       let operations = Object.keys(indicesMap).map(currentIndexName => {
         return new Promise((innerResolve, innerReject) => {
