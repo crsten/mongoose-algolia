@@ -5,7 +5,7 @@ const clc = require('cli-color')
 
 const utils = require('./utils')
 
-module.exports = function(options, client) {
+module.exports = function (options, client) {
   return new Promise((resolve, reject) => {
     let query = this.find()
 
@@ -29,18 +29,18 @@ module.exports = function(options, client) {
       let indicesMap = {}
 
       docs.forEach(doc => {
-        let indices = utils.GetIndexName(doc, options.indexName)
+        utils.GetIndexName(doc, options.indexName).then(indices => {
+          if (indices instanceof Array) indices.forEach(entry => addToIndex(entry, doc))
+          else addToIndex(indices, doc)
 
-        if (indices instanceof Array) indices.forEach(entry => addToIndex(entry, doc))
-        else addToIndex(indices, doc)
-
-        function addToIndex(entry, item) {
-          if (indicesMap[entry]) {
-            indicesMap[entry].push(item)
-          } else {
-            indicesMap[entry] = [item]
+          function addToIndex(entry, item) {
+            if (indicesMap[entry]) {
+              indicesMap[entry].push(item)
+            } else {
+              indicesMap[entry] = [item]
+            }
           }
-        }
+        })
       })
 
       let operations = Object.keys(indicesMap).map(currentIndexName => {
@@ -75,7 +75,7 @@ module.exports = function(options, client) {
             objects = objects.map(obj => {
               return obj.toObject({
                 versionKey: false,
-                transform: function(doc, ret) {
+                transform: function (doc, ret) {
                   if (doc.constructor.modelName !== obj.constructor.modelName) return ret
 
                   ret = utils.ApplyVirtuals(ret, options.virtuals)

@@ -5,7 +5,7 @@ const clc = require('cli-color')
 
 const utils = require('./utils')
 
-module.exports = function(settings, options, client) {
+module.exports = function (settings, options, client) {
   this.find().exec((err, docs) => {
     if (err)
       return console.error(
@@ -20,16 +20,16 @@ module.exports = function(settings, options, client) {
     let indices = []
 
     docs.forEach(doc => {
-      let _indices = utils.GetIndexName(doc, options.indexName)
+      utils.GetIndexName(doc, options.indexName).then(_indices => {
+        if (_indices instanceof Array) _indices.forEach(entry => addToIndex(entry))
+        else addToIndex(_indices)
 
-      if (_indices instanceof Array) _indices.forEach(entry => addToIndex(entry))
-      else addToIndex(_indices)
-
-      function addToIndex(entry) {
-        if (!indices.includes(entry)) {
-          indices.push(entry)
+        function addToIndex(entry) {
+          if (!indices.includes(entry)) {
+            indices.push(entry)
+          }
         }
-      }
+      })
     })
 
     indices.forEach(currentIndexName => {
