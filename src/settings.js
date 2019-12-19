@@ -6,7 +6,7 @@ const clc = require('cli-color')
 const utils = require('./utils')
 
 module.exports = function (settings, options, client) {
-  this.find().exec((err, docs) => {
+  this.find().exec(async (err, docs) => {
     if (err)
       return console.error(
         clc.blackBright(`[${new Date().toLocaleTimeString()}]`),
@@ -20,16 +20,16 @@ module.exports = function (settings, options, client) {
     let indices = []
 
     for (const doc of docs) {
-      utils.GetIndexName(doc, options.indexName).then(_indices => {
-        if (_indices instanceof Array) _indices.forEach(entry => addToIndex(entry))
-        else addToIndex(_indices)
+      const _indices = await utils.GetIndexName(doc, options.indexName)
 
-        function addToIndex(entry) {
-          if (!indices.includes(entry)) {
-            indices.push(entry)
-          }
+      if (_indices instanceof Array) _indices.forEach(entry => addToIndex(entry))
+      else addToIndex(_indices)
+
+      function addToIndex(entry) {
+        if (!indices.includes(entry)) {
+          indices.push(entry)
         }
-      })
+      }
     }
 
     indices.forEach(currentIndexName => {
