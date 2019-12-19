@@ -28,7 +28,7 @@ module.exports = function (options, client) {
 
       let indicesMap = {}
 
-      docs.forEach(doc => {
+      for (const doc of docs) {
         utils.GetIndexName(doc, options.indexName).then(indices => {
           if (indices instanceof Array) indices.forEach(entry => addToIndex(entry, doc))
           else addToIndex(indices, doc)
@@ -41,7 +41,7 @@ module.exports = function (options, client) {
             }
           }
         })
-      })
+      }
 
       let operations = Object.keys(indicesMap).map(currentIndexName => {
         return new Promise((innerResolve, innerReject) => {

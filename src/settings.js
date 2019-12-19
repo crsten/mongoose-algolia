@@ -19,7 +19,7 @@ module.exports = function (settings, options, client) {
 
     let indices = []
 
-    docs.forEach(doc => {
+    for (const doc of docs) {
       utils.GetIndexName(doc, options.indexName).then(_indices => {
         if (_indices instanceof Array) _indices.forEach(entry => addToIndex(entry))
         else addToIndex(_indices)
@@ -30,7 +30,7 @@ module.exports = function (settings, options, client) {
           }
         }
       })
-    })
+    }
 
     indices.forEach(currentIndexName => {
       let currentIndex = client.initIndex(currentIndexName)
