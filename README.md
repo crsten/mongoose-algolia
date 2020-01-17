@@ -216,6 +216,7 @@ Model.SetAlgoliaSettings({
 #### doc.SyncToAlgolia
 
 doc = document from mongoose
+
 Call this method if you want to sync your document to Algolia
 
 ```js
@@ -225,10 +226,11 @@ doc.SyncToAlgolia()
 #### doc.RemoveFromAlgolia
 
 doc = document from mongoose
+
 Call this method if you want to remove your document from the Algolia index
 
 ```js
-doc.SyncToAlgolia()
+doc.RemoveFromAlgolia()
 ```
 
 ## License
