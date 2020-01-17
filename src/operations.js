@@ -41,6 +41,7 @@ module.exports = function(schema, options, client) {
   schema.methods.getAlgoliaObject = function() {
     return this.toObject({
       versionKey: false,
+      virtuals: true,
       transform: (doc, ret) => {
         if (doc.constructor.modelName !== this.constructor.modelName) return ret
 
