@@ -195,7 +195,7 @@ You can enable logging of all operations by setting `debug` to true
 
 #### SyncToAlgolia
 
-Call this method if you want to sync all your documents with algolia
+Call this method if you want to sync all your documents with algolia (for single doc sync see **doc.SyncToAlgolia**)
 
 This method clears the Algolia index for this schema and synchronizes all documents to Algolia (based on the settings defined in your plugin settings)
 
