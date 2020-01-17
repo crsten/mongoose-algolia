@@ -1,17 +1,13 @@
 'use strict'
 
-const algolia = require('algoliasearch')
 const clc = require('cli-color')
-
 const utils = require('./utils')
 
-module.exports = function (options, client) {
+module.exports = function(options, client) {
   return new Promise((resolve, reject) => {
     let query = this.find()
 
-    if (options.populate) {
-      query = query.populate(options.populate)
-    }
+    if (options.populate) query = query.populate(options.populate)
 
     query.exec(async (err, docs) => {
       if (err) {
@@ -43,7 +39,6 @@ module.exports = function (options, client) {
         }
       }
 
-
       let operations = Object.keys(indicesMap).map(currentIndexName => {
         return new Promise((innerResolve, innerReject) => {
           let currentIndex = client.initIndex(currentIndexName)
@@ -73,27 +68,9 @@ module.exports = function (options, client) {
 
             if (options.filter) objects = objects.filter(obj => options.filter(obj._doc))
 
-            objects = objects.map(obj => {
-              return obj.toObject({
-                versionKey: false,
-                transform: function (doc, ret) {
-                  if (doc.constructor.modelName !== obj.constructor.modelName) return ret
+            objects = objects.map(obj => obj.getAlgoliaObject())
 
-                  ret = utils.ApplyVirtuals(ret, options.virtuals)
-                  ret = utils.ApplyMappings(ret, options.mappings)
-                  ret = utils.ApplyDefaults(ret, options.defaults)
-                  ret = utils.ApplySelector(ret, options.selector)
-
-                  delete ret._id
-                  delete ret.__v
-                  ret.objectID = doc._id
-
-                  return ret
-                },
-              })
-            })
-
-            currentIndex.saveObjects(objects, (err, content) => {
+            currentIndex.saveObjects(objects, err => {
               if (err) {
                 innerReject(err)
                 return console.error(
@@ -122,9 +99,7 @@ module.exports = function (options, client) {
       })
 
       Promise.all(operations)
-        .then(result => {
-          resolve()
-        })
+        .then(() => resolve())
         .catch(reject)
     })
   })

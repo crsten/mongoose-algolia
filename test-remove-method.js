@@ -18,18 +18,8 @@ mongoose.Promise = global.Promise
 const Show = require('./models/show')
 const Character = require('./models/character')
 
-Show.find().exec((err, shows) => {
-  if (err) return console.log(err)
-
-  shows.forEach(show => {
-    show.remove()
-  })
-})
-
 Character.find().exec((err, chars) => {
   if (err) return console.log(err)
 
-  chars.forEach(char => {
-    char.remove()
-  })
+  chars.forEach(char => char.RemoveFromAlgolia())
 })

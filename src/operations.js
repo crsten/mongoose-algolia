@@ -1,7 +1,6 @@
 'use strict'
 
 const utils = require('./utils')
-const clc = require('cli-color')
 
 module.exports = function(schema, options, client) {
   schema.pre('save', function(next) {
@@ -22,156 +21,72 @@ module.exports = function(schema, options, client) {
   })
 
   schema.post('save', function() {
-    utils.GetIndexName(this, options.indexName).then(indices => {
-      if (indices instanceof Array) {
-        indices.forEach(index => SyncItem(this, client.initIndex(index)))
-      } else {
-        SyncItem(this, client.initIndex(indices))
-      }
-    })
+    RunActionOnIndices(this, SyncItem)
   })
 
   schema.post('remove', function() {
-    utils.GetIndexName(this, options.indexName).then(indices => {
-      if (indices instanceof Array) {
-        indices.forEach(index => RemoveItem(this, client.initIndex(index)))
-      } else {
-        RemoveItem(this, client.initIndex(indices))
-      }
-    })
+    RunActionOnIndices(this, RemoveItem)
   })
 
-  function RemoveItem(context, index) {
-    index.deleteObject(context._id.toString(), err => {
-      if (err)
-        return console.error(
-          clc.blackBright(`[${new Date().toLocaleTimeString()}]`),
-          clc.cyanBright('[Algolia-sync]'),
-          ' -> ',
-          clc.red.bold('Error'),
-          ' -> ',
-          err,
-        )
-      if (options.debug)
-        console.log(
-          clc.blackBright(`[${new Date().toLocaleTimeString()}]`),
-          clc.cyanBright('[Algolia-sync]'),
-          ' -> ',
-          clc.greenBright('Deleted'),
-          ' -> ObjectId: ',
-          context._id,
-        )
+  schema.methods.SyncToAlgolia = function() {
+    this.algoliaWasModified = true
+    this.algoliaWasNew = false
+    RunActionOnIndices(this, SyncItem)
+  }
+
+  schema.methods.RemoveFromAlgolia = function() {
+    RunActionOnIndices(this, RemoveItem)
+  }
+
+  schema.methods.getAlgoliaObject = function() {
+    return this.toObject({
+      versionKey: false,
+      transform: (doc, ret) => {
+        if (doc.constructor.modelName !== this.constructor.modelName) return ret
+
+        ret = utils.ApplyVirtuals(ret, options.virtuals)
+        ret = utils.ApplyMappings(ret, options.mappings)
+        ret = utils.ApplyDefaults(ret, options.defaults)
+
+        delete ret._id
+        ret.objectID = doc._id
+
+        return utils.ApplySelector(ret, options.selector)
+      },
     })
   }
 
-  function SyncItem(context, index) {
-    if (options.filter && !options.filter(context._doc)) {
-      RemoveItem(context, index)
-    } else if (context.algoliaWasNew) {
-      utils
-        .ApplyPopulation(context, options.populate)
-        .then(populated => {
-          index.addObject(
-            populated.toObject({
-              versionKey: false,
-              transform: function(doc, ret) {
-                if (doc.constructor.modelName !== populated.constructor.modelName) return ret
+  function RunActionOnIndices(doc, action) {
+    utils.GetIndexName(doc, options.indexName).then(indices => {
+      if (indices instanceof Array) {
+        indices.forEach(index => action(doc, client.initIndex(index)))
+      } else {
+        action(doc, client.initIndex(indices))
+      }
+    })
+  }
 
-                ret = utils.ApplyVirtuals(ret, options.virtuals)
-                ret = utils.ApplyMappings(ret, options.mappings)
-                ret = utils.ApplyDefaults(ret, options.defaults)
+  function RemoveItem(doc, index) {
+    index.deleteObject(doc._id.toString(), err => {
+      if (err) return utils.Logger.Error('Error', err)
+      if (options.debug) utils.Logger.Success('Deleted', doc._id)
+    })
+  }
 
-                delete ret._id
+  function SyncItem(doc, index) {
+    if (options.filter && !options.filter(doc._doc)) return RemoveItem(doc, index)
+    if (!doc.algoliaWasNew && !doc.algoliaWasModified) return
 
-                return utils.ApplySelector(ret, options.selector)
-              },
-            }),
-            context._id,
-            (err, content) => {
-              if (err)
-                return console.error(
-                  clc.blackBright(`[${new Date().toLocaleTimeString()}]`),
-                  clc.cyanBright('[Algolia-sync]'),
-                  ' -> ',
-                  clc.red.bold('Error'),
-                  ' -> ',
-                  err,
-                )
-              if (options.debug)
-                console.log(
-                  clc.blackBright(`[${new Date().toLocaleTimeString()}]`),
-                  clc.cyanBright('[Algolia-sync]'),
-                  ' -> ',
-                  clc.greenBright('Created'),
-                  ' -> ObjectId: ',
-                  content.objectID,
-                )
-            },
-          )
+    utils
+      .ApplyPopulation(doc, options.populate)
+      .then(populated => {
+        index.addObject(populated.getAlgoliaObject(), (err, content) => {
+          if (err) return utils.Logger.Error('Error', err)
+          if (options.debug) utils.Logger.Success(doc.algoliaWasNew ? 'Created' : 'Updated', content.objectID)
         })
-        .catch(err => {
-          console.error(
-            clc.blackBright(`[${new Date().toLocaleTimeString()}]`),
-            clc.cyanBright('[Algolia-sync]'),
-            ' -> ',
-            clc.red.bold('Error (at population)'),
-            ' -> ',
-            err,
-          )
-        })
-    } else if (context.algoliaWasModified) {
-      utils
-        .ApplyPopulation(context, options.populate)
-        .then(populated => {
-          index.saveObject(
-            populated.toObject({
-              versionKey: false,
-              transform: function(doc, ret) {
-                if (doc.constructor.modelName !== populated.constructor.modelName) return ret
-
-                ret = utils.ApplyVirtuals(ret, options.virtuals)
-                ret = utils.ApplyMappings(ret, options.mappings)
-                ret = utils.ApplyDefaults(ret, options.defaults)
-                ret = utils.ApplySelector(ret, options.selector)
-
-                delete ret._id
-                ret.objectID = doc._id
-
-                return ret
-              },
-            }),
-            (err, content) => {
-              if (err)
-                return console.error(
-                  clc.blackBright(`[${new Date().toLocaleTimeString()}]`),
-                  clc.cyanBright('[Algolia-sync]'),
-                  ' -> ',
-                  clc.red.bold('Error'),
-                  ' -> ',
-                  err,
-                )
-              if (options.debug)
-                console.log(
-                  clc.blackBright(`[${new Date().toLocaleTimeString()}]`),
-                  clc.cyanBright('[Algolia-sync]'),
-                  ' -> ',
-                  clc.greenBright('Updated'),
-                  ' -> ObjectId: ',
-                  content.objectID,
-                )
-            },
-          )
-        })
-        .catch(err => {
-          console.error(
-            clc.blackBright(`[${new Date().toLocaleTimeString()}]`),
-            clc.cyanBright('[Algolia-sync]'),
-            ' -> ',
-            clc.red.bold('Error (at population)'),
-            ' -> ',
-            err,
-          )
-        })
-    }
+      })
+      .catch(err => {
+        return utils.Logger.Error('Error (at population)', err)
+      })
   }
 }
