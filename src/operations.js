@@ -16,8 +16,8 @@ module.exports = function(options, client) {
       if (this.isModified()) isModified = true;
     }
 
-    this.wasNew = this.isNew;
-    this.wasModified = isModified;
+    this.algoliaWasNew = this.isNew;
+    this.algoliaWasModified = isModified;
     next();
   });
 
@@ -67,7 +67,7 @@ module.exports = function(options, client) {
   function SyncItem(context, index) {
     if (options.filter && !options.filter(context._doc)) {
       RemoveItem(context, index);
-    } else if (context.wasNew) {
+    } else if (context.algoliaWasNew) {
       utils
         .ApplyPopulation(context, options.populate)
         .then(populated => {
@@ -122,7 +122,7 @@ module.exports = function(options, client) {
             err
           );
         });
-    } else if (context.wasModified) {
+    } else if (context.algoliaWasModified) {
       utils
         .ApplyPopulation(context, options.populate)
         .then(populated => {
