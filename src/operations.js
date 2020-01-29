@@ -48,11 +48,12 @@ module.exports = function(schema, options, client) {
         ret = utils.ApplyVirtuals(ret, options.virtuals)
         ret = utils.ApplyMappings(ret, options.mappings)
         ret = utils.ApplyDefaults(ret, options.defaults)
+        ret = utils.ApplySelector(ret, options.selector)
 
-        delete ret._id
         ret.objectID = doc._id
+        delete ret._id
 
-        return utils.ApplySelector(ret, options.selector)
+        return ret
       },
     })
   }
