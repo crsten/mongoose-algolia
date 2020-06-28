@@ -28,6 +28,18 @@ module.exports = function(schema, options, client) {
     RunActionOnIndices(this, RemoveItem)
   })
 
+  schema.post('findOneAndUpdate', async function(result) {
+    if(result) {
+      let cDoc = result
+      if(typeof result.populate !=='function') {
+        cDoc = await this.model.findById(result._id);
+      }
+      cDoc.algoliaWasModified = true
+      cDoc.algoliaWasNew = false
+      RunActionOnIndices(cDoc, SyncItem)
+    } 
+  });
+
   schema.methods.SyncToAlgolia = function() {
     this.algoliaWasModified = true
     this.algoliaWasNew = false
