@@ -33,7 +33,7 @@
     "cz-conventional-changelog": "^2.1.0",
     "dotenv": "^2.0.0",
     "mongoose": "^5.7.5",
-    "semantic-release": "^15.13.3",
+    "semantic-release": "^17.2.3",
     "semantic-release-cli": "^4.1.2"
   },
   "version": "0.0.0-development",
